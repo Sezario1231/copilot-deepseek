@@ -63,7 +63,16 @@ public partial class SidebarWindow : Window
     {
         if (_webView != null) return;
 
-        _webView = new WebView2 { Source = new Uri(_settings.ChatUrl) };
+        _webView = new WebView2
+        {
+            Source = new Uri(_settings.ChatUrl),
+            CreationProperties = new Microsoft.Web.WebView2.Wpf.CoreWebView2CreationProperties
+            {
+                UserDataFolder = System.IO.Path.Combine(
+                    System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
+                    "DeepSeekCopilot", "WebView2")
+            }
+        };
         WebViewHost.Children.Add(_webView);
 
         await _webView.EnsureCoreWebView2Async();
