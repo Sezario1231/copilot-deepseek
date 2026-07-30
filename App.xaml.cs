@@ -60,7 +60,7 @@ public partial class App : System.Windows.Application
 
         var menu = new Forms.ContextMenuStrip();
 
-        _mapMenuItem = new Forms.ToolStripMenuItem("Copilot → 右 Ctrl")
+        _mapMenuItem = new Forms.ToolStripMenuItem("将Copilot映射为右Ctrl")
         {
             Checked = _windowManager!.Settings.MapCopilotToRightCtrl
         };
@@ -75,6 +75,25 @@ public partial class App : System.Windows.Application
         menu.Items.Add("显示/隐藏", null, (_, _) => _windowManager?.Toggle());
         menu.Items.Add("设置", null, (_, _) => _windowManager?.OpenSettings());
         menu.Items.Add(new Forms.ToolStripSeparator());
+
+        var themeMenu = new Forms.ToolStripMenuItem("主题");
+        var themes = new[] { ("跟随系统", deepseek_copilot.ThemeMode.System), ("浅色", deepseek_copilot.ThemeMode.Light), ("深色", deepseek_copilot.ThemeMode.Dark) };
+        foreach (var (label, mode) in themes)
+        {
+            var item = new Forms.ToolStripMenuItem(label)
+            {
+                Checked = _windowManager!.Settings.GetThemeMode() == mode
+            };
+            item.Click += (_, _) =>
+            {
+                _windowManager!.SetTheme(mode);
+                foreach (Forms.ToolStripMenuItem t in themeMenu.DropDownItems)
+                    t.Checked = t == item;
+            };
+            themeMenu.DropDownItems.Add(item);
+        }
+        menu.Items.Add(themeMenu);
+
         menu.Items.Add(_mapMenuItem);
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("退出", null, (_, _) => ExitApp());
@@ -83,26 +102,7 @@ public partial class App : System.Windows.Application
 
     private static System.Drawing.Icon CreateTrayIcon()
     {
-        try
-        {
-            return IconHelper.RenderToIcon(32);
-        }
-        catch
-        {
-            return FallbackIcon();
-        }
-    }
-
-    private static System.Drawing.Icon FallbackIcon()
-    {
-        using var bmp = new System.Drawing.Bitmap(16, 16);
-        using var g = System.Drawing.Graphics.FromImage(bmp);
-        g.Clear(System.Drawing.Color.Transparent);
-        using var bg = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(0x4F, 0x6B, 0xED));
-        g.FillRectangle(bg, 0, 0, 16, 16);
-        using var font = new System.Drawing.Font("Segoe UI", 9, System.Drawing.FontStyle.Bold);
-        g.DrawString("D", font, System.Drawing.Brushes.White, 2, 1);
-        return System.Drawing.Icon.FromHandle(bmp.GetHicon());
+        return IconHelper.RenderToIcon(32);
     }
 
     private void ExitApp()

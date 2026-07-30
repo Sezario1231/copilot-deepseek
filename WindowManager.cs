@@ -57,6 +57,13 @@ public sealed class WindowManager
         OnSettingsClicked();
     }
 
+    public void SetTheme(ThemeMode mode)
+    {
+        Settings.SetThemeMode(mode);
+        Settings.Save();
+        _sidebar?.ApplyTheme(mode);
+    }
+
     public void Cleanup()
     {
         _sidebar?.Close();
