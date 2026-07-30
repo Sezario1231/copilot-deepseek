@@ -3,6 +3,13 @@ using Microsoft.Win32;
 
 namespace deepseek_copilot;
 
+public enum ThemeMode
+{
+    System,
+    Light,
+    Dark
+}
+
 public sealed class AppSettings
 {
     private const string AutoStartKey = "DeepSeekCopilot";
@@ -11,6 +18,38 @@ public sealed class AppSettings
     public bool AutoStart { get; set; }
     public int UnloadDelaySeconds { get; set; } = 5;
     public string ChatUrl { get; set; } = "https://chat.deepseek.com/";
+    public string Theme { get; set; } = "System";
+    public double AnimationSpeed { get; set; } = 1.0;
+    public double SidebarOpacity { get; set; } = 1.0;
+
+    public ThemeMode GetThemeMode() => Theme switch
+    {
+        "Dark" => ThemeMode.Dark,
+        "Light" => ThemeMode.Light,
+        _ => ThemeMode.System
+    };
+
+    public void SetThemeMode(ThemeMode mode) => Theme = mode.ToString();
+
+    public static bool IsSystemDarkMode()
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+            if (key?.GetValue("AppsUseLightTheme") is int i)
+                return i == 0;
+        }
+        catch { }
+        return false;
+    }
+
+    public bool IsDarkTheme => GetThemeMode() switch
+    {
+        ThemeMode.Dark => true,
+        ThemeMode.Light => false,
+        _ => IsSystemDarkMode()
+    };
 
     private static string FilePath =>
         Path.Combine(

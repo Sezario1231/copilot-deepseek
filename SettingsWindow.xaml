@@ -8,11 +8,14 @@
         Title="DeepSeek Copilot 设置"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Width="400" Height="360"
+        Width="400" Height="450"
         ShowInTaskbar="False"
         Topmost="True">
     <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -54,6 +57,49 @@
 
         <Grid Grid.Row="4" Margin="0,12,0,0">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="主题" FontSize="14" Foreground="#333"
+                       VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <ComboBox x:Name="ThemeCombo" Grid.Column="1" FontSize="13"
+                      SelectedIndex="0">
+                <ComboBoxItem Content="跟随系统"/>
+                <ComboBoxItem Content="浅色"/>
+                <ComboBoxItem Content="深色"/>
+            </ComboBox>
+        </Grid>
+
+        <Grid Grid.Row="5" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" FontSize="14" Foreground="#333" VerticalAlignment="Center">
+                <Run Text="不透明度"/>
+                <Run Text="{Binding ElementName=OpacitySlider, Path=Value, StringFormat={}{0:P0}}"/>
+            </TextBlock>
+            <Slider x:Name="OpacitySlider" Grid.Column="1" Minimum="0.3" Maximum="1.0"
+                    Value="1.0" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                    Width="100" Margin="8,0,0,0"/>
+        </Grid>
+
+        <Grid Grid.Row="6" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" FontSize="14" Foreground="#333" VerticalAlignment="Center">
+                <Run Text="滑出动画速率"/>
+                <Run Text="{Binding ElementName=SpeedSlider, Path=Value, StringFormat={}{0:0.0}x}"/>
+            </TextBlock>
+            <Slider x:Name="SpeedSlider" Grid.Column="1" Minimum="0.25" Maximum="4"
+                    Value="1.0" TickFrequency="0.25" IsSnapToTickEnabled="True"
+                    Width="100" Margin="8,0,0,0"/>
+        </Grid>
+
+        <Grid Grid.Row="7" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
@@ -64,7 +110,7 @@
                     Width="100" Margin="8,0,0,0"/>
         </Grid>
 
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+        <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <Button Content="保存" Width="80" Height="32"
                     Background="#4F6BED" Foreground="White" BorderThickness="0"
                     Click="OnSaveClick" Cursor="Hand" Margin="0,0,8,0"/>

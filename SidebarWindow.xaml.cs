@@ -2,6 +2,7 @@ using Microsoft.Web.WebView2.Wpf;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
@@ -9,7 +10,7 @@ namespace deepseek_copilot;
 
 public partial class SidebarWindow : Window
 {
-    private const double AnimationDurationMs = 250;
+    private const double BaseAnimationDurationMs = 250;
     private readonly AppSettings _settings;
     private double _sidebarWidth = 450;
     private DispatcherTimer? _unloadTimer;
@@ -19,6 +20,19 @@ public partial class SidebarWindow : Window
     public bool IsAnimating { get; private set; }
     public event Action? SettingsClicked;
 
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int value, int size);
+
+    [DllImport("user32.dll")]
+    private static extern int GetWindowLong(IntPtr hwnd, int index);
+
+    [DllImport("user32.dll")]
+    private static extern int SetWindowLong(IntPtr hwnd, int index, int value);
+
+    private const int GWL_STYLE = -16;
+    private const int WS_THICKFRAME = 0x40000;
+    private const int WM_NCCALCSIZE = 0x0083;
+
     [DllImport("user32.dll")]
     private static extern IntPtr GetForegroundWindow();
 
@@ -26,6 +40,8 @@ public partial class SidebarWindow : Window
     private static extern IntPtr GetAncestor(IntPtr hWnd, uint gaFlags);
 
     private const uint GA_ROOTOWNER = 3;
+
+    private IntPtr _hwnd;
 
     public SidebarWindow(AppSettings settings)
     {
@@ -43,6 +59,34 @@ public partial class SidebarWindow : Window
         Deactivated += OnDeactivated;
         PreviewKeyDown += OnPreviewKeyDown;
         Loaded += OnLoaded;
+    }
+
+    public void ApplyTheme(ThemeMode theme)
+    {
+        _settings.SetThemeMode(theme);
+        var isDark = _settings.IsDarkTheme;
+
+        TitleBar.Background = new SolidColorBrush(isDark
+            ? System.Windows.Media.Color.FromRgb(0x15, 0x15, 0x17)
+            : System.Windows.Media.Color.FromRgb(0xFF, 0xFF, 0xFF));
+
+        var textColor = isDark ? Colors.White : System.Windows.Media.Color.FromRgb(0x1A, 0x1A, 0x2E);
+        TitleText.Foreground = new SolidColorBrush(textColor);
+
+        var btnColor = isDark ? Colors.White : System.Windows.Media.Color.FromRgb(0x66, 0x66, 0x66);
+        SettingsButton.Foreground = new SolidColorBrush(btnColor);
+        CloseButton.Foreground = new SolidColorBrush(btnColor);
+
+        SetWebViewColorScheme(isDark);
+    }
+
+    private void SetWebViewColorScheme(bool isDark)
+    {
+        if (_webView?.CoreWebView2 == null) return;
+        _webView.CoreWebView2.Profile.PreferredColorScheme =
+            isDark
+                ? Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme.Dark
+                : Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme.Light;
     }
 
     public void ApplyWidth(double width)
@@ -74,6 +118,7 @@ public partial class SidebarWindow : Window
 
         await _webView.EnsureCoreWebView2Async(env);
         _webView.CoreWebView2!.DocumentTitleChanged += OnTitleChanged;
+        SetWebViewColorScheme(_settings.IsDarkTheme);
         _webView.CoreWebView2.Navigate(_settings.ChatUrl);
         TitleText.Text = _webView.CoreWebView2.DocumentTitle;
     }
@@ -143,7 +188,7 @@ public partial class SidebarWindow : Window
         {
             From = workArea.Right,
             To = workArea.Right - _sidebarWidth,
-            Duration = TimeSpan.FromMilliseconds(AnimationDurationMs),
+            Duration = TimeSpan.FromMilliseconds(BaseAnimationDurationMs / _settings.AnimationSpeed),
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
         };
         anim.Completed += (_, _) =>
@@ -163,7 +208,7 @@ public partial class SidebarWindow : Window
         {
             From = Left,
             To = SystemParameters.WorkArea.Right,
-            Duration = TimeSpan.FromMilliseconds(AnimationDurationMs),
+            Duration = TimeSpan.FromMilliseconds(BaseAnimationDurationMs / _settings.AnimationSpeed),
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
         };
         anim.Completed += (_, _) =>

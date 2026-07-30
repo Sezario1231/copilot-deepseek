@@ -6,16 +6,19 @@
         xmlns:local="clr-namespace:deepseek_copilot"
         mc:Ignorable="d"
         WindowStyle="None"
-        AllowsTransparency="True"
         Topmost="True"
         ShowInTaskbar="False"
         ResizeMode="NoResize"
+        Background="Transparent"
         Width="450">
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="0"
+                      ResizeBorderThickness="0"
+                      CaptionHeight="0"
+                      UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
     <Grid>
-        <Border CornerRadius="8,0,0,8" Background="#FFFFFF">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="16" Opacity="0.25" ShadowDepth="2" Direction="270"/>
-            </Border.Effect>
+        <Border x:Name="MainBorder" CornerRadius="8,0,0,8" Background="#FFFFFF">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
@@ -23,7 +26,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Title Bar -->
-                <Border Grid.Row="0" Background="#F8F9FA" CornerRadius="8,0,0,0">
+                <Border x:Name="TitleBar" Grid.Row="0" Background="#FFFFFF" CornerRadius="8,0,0,0">
                     <Grid>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
                             <Image x:Name="TitleIcon" Width="18" Height="18"/>
