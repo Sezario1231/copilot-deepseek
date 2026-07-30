@@ -31,7 +31,7 @@ public sealed class WindowManager
             _sidebar = new SidebarWindow(_settings);
             _sidebar.ApplyWidth(_settings.SidebarWidth);
             _sidebar.ApplyTheme(_settings.GetThemeMode());
-            _sidebar.Opacity = _settings.SidebarOpacity;
+            _sidebar.ApplyOpacity(_settings.SidebarOpacity);
             _sidebar.SettingsClicked += OnSettingsClicked;
         }
 
@@ -48,7 +48,7 @@ public sealed class WindowManager
         var win = new SettingsWindow(_settings,
             onWidthChanged: w => _sidebar?.ApplyWidth(w),
             onThemeChanged: t => _sidebar?.ApplyTheme(t),
-            onOpacityChanged: o => _sidebar!.Opacity = o);
+            onOpacityChanged: o => _sidebar!.ApplyOpacity(o));
         win.ShowDialog();
     }
 

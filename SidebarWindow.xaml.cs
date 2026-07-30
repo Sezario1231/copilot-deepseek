@@ -20,19 +20,6 @@ public partial class SidebarWindow : Window
     public bool IsAnimating { get; private set; }
     public event Action? SettingsClicked;
 
-    [DllImport("dwmapi.dll")]
-    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int value, int size);
-
-    [DllImport("user32.dll")]
-    private static extern int GetWindowLong(IntPtr hwnd, int index);
-
-    [DllImport("user32.dll")]
-    private static extern int SetWindowLong(IntPtr hwnd, int index, int value);
-
-    private const int GWL_STYLE = -16;
-    private const int WS_THICKFRAME = 0x40000;
-    private const int WM_NCCALCSIZE = 0x0083;
-
     [DllImport("user32.dll")]
     private static extern IntPtr GetForegroundWindow();
 
@@ -40,8 +27,6 @@ public partial class SidebarWindow : Window
     private static extern IntPtr GetAncestor(IntPtr hWnd, uint gaFlags);
 
     private const uint GA_ROOTOWNER = 3;
-
-    private IntPtr _hwnd;
 
     public SidebarWindow(AppSettings settings)
     {
@@ -64,12 +49,9 @@ public partial class SidebarWindow : Window
     public void ApplyTheme(ThemeMode theme)
     {
         _settings.SetThemeMode(theme);
+        ApplyOpacity(_settings.SidebarOpacity);
+
         var isDark = _settings.IsDarkTheme;
-
-        TitleBar.Background = new SolidColorBrush(isDark
-            ? System.Windows.Media.Color.FromRgb(0x15, 0x15, 0x17)
-            : System.Windows.Media.Color.FromRgb(0xFF, 0xFF, 0xFF));
-
         var textColor = isDark ? Colors.White : System.Windows.Media.Color.FromRgb(0x1A, 0x1A, 0x2E);
         TitleText.Foreground = new SolidColorBrush(textColor);
 
@@ -78,6 +60,19 @@ public partial class SidebarWindow : Window
         CloseButton.Foreground = new SolidColorBrush(btnColor);
 
         SetWebViewColorScheme(isDark);
+    }
+
+    public void ApplyOpacity(double opacity)
+    {
+        var isDark = _settings.IsDarkTheme;
+        var baseColor = isDark
+            ? System.Windows.Media.Color.FromRgb(0x15, 0x15, 0x17)
+            : System.Windows.Media.Color.FromRgb(0xFF, 0xFF, 0xFF);
+        var alpha = (byte)(opacity * 255);
+        var bgColor = System.Windows.Media.Color.FromArgb(alpha, baseColor.R, baseColor.G, baseColor.B);
+
+        MainBorder.Background = new SolidColorBrush(bgColor);
+        TitleBar.Background = new SolidColorBrush(bgColor);
     }
 
     private void SetWebViewColorScheme(bool isDark)
@@ -148,17 +143,20 @@ public partial class SidebarWindow : Window
 
     private void StartUnloadTimer()
     {
-        _unloadTimer?.Stop();
-        _unloadTimer = new DispatcherTimer
+        if (_unloadTimer == null)
         {
-            Interval = TimeSpan.FromSeconds(_settings.UnloadDelaySeconds)
-        };
-        _unloadTimer.Tick += (_, _) =>
-        {
-            if (Visibility != Visibility.Visible)
-                DestroyWebView();
-        };
+            _unloadTimer = new DispatcherTimer();
+            _unloadTimer.Tick += OnUnloadTick;
+        }
+        _unloadTimer.Interval = TimeSpan.FromSeconds(_settings.UnloadDelaySeconds);
         _unloadTimer.Start();
+    }
+
+    private void OnUnloadTick(object? sender, EventArgs e)
+    {
+        _unloadTimer?.Stop();
+        if (Visibility != Visibility.Visible)
+            DestroyWebView();
     }
 
     public async void SlideIn()
