@@ -63,20 +63,18 @@ public partial class SidebarWindow : Window
     {
         if (_webView != null) return;
 
-        _webView = new WebView2
-        {
-            Source = new Uri(_settings.ChatUrl),
-            CreationProperties = new Microsoft.Web.WebView2.Wpf.CoreWebView2CreationProperties
-            {
-                UserDataFolder = System.IO.Path.Combine(
-                    System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
-                    "DeepSeekCopilot", "WebView2")
-            }
-        };
+        var env = await Microsoft.Web.WebView2.Core.CoreWebView2Environment.CreateAsync(
+            null,
+            System.IO.Path.Combine(
+                System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
+                "DeepSeekCopilot", "WebView2"));
+
+        _webView = new WebView2();
         WebViewHost.Children.Add(_webView);
 
-        await _webView.EnsureCoreWebView2Async();
+        await _webView.EnsureCoreWebView2Async(env);
         _webView.CoreWebView2!.DocumentTitleChanged += OnTitleChanged;
+        _webView.CoreWebView2.Navigate(_settings.ChatUrl);
         TitleText.Text = _webView.CoreWebView2.DocumentTitle;
     }
 
