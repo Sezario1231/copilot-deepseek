@@ -12,6 +12,7 @@ public partial class SettingsWindow : Window
     private readonly string _originalChatUrl;
     private readonly ThemeMode _originalTheme;
     private readonly double _originalOpacity;
+    private readonly bool _originalCopilotMap;
 
     public SettingsWindow(AppSettings settings, Action<double> onWidthChanged,
         Action<ThemeMode> onThemeChanged, Action<double> onOpacityChanged)
@@ -21,6 +22,7 @@ public partial class SettingsWindow : Window
         _originalChatUrl = settings.ChatUrl;
         _originalTheme = settings.GetThemeMode();
         _originalOpacity = settings.SidebarOpacity;
+        _originalCopilotMap = settings.MapCopilotToRightCtrl;
         _onWidthChanged = onWidthChanged;
         _onThemeChanged = onThemeChanged;
         _onOpacityChanged = onOpacityChanged;
@@ -58,6 +60,7 @@ public partial class SettingsWindow : Window
         _settings.ChatUrl = _originalChatUrl;
         _settings.SetThemeMode(_originalTheme);
         _settings.SidebarOpacity = _originalOpacity;
+        _settings.MapCopilotToRightCtrl = _originalCopilotMap;
         _onWidthChanged(_settings.SidebarWidth);
         _onThemeChanged(_originalTheme);
         _onOpacityChanged(_originalOpacity);

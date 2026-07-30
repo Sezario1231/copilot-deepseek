@@ -2,12 +2,12 @@ namespace deepseek_copilot;
 
 public sealed class WindowManager
 {
+    public AppSettings Settings { get; }
     private SidebarWindow? _sidebar;
-    private readonly AppSettings _settings;
 
     public WindowManager()
     {
-        _settings = AppSettings.Load();
+        Settings = AppSettings.Load();
     }
 
     public void Toggle()
@@ -28,10 +28,10 @@ public sealed class WindowManager
     {
         if (_sidebar == null)
         {
-            _sidebar = new SidebarWindow(_settings);
-            _sidebar.ApplyWidth(_settings.SidebarWidth);
-            _sidebar.ApplyTheme(_settings.GetThemeMode());
-            _sidebar.ApplyOpacity(_settings.SidebarOpacity);
+            _sidebar = new SidebarWindow(Settings);
+            _sidebar.ApplyWidth(Settings.SidebarWidth);
+            _sidebar.ApplyTheme(Settings.GetThemeMode());
+            _sidebar.ApplyOpacity(Settings.SidebarOpacity);
             _sidebar.SettingsClicked += OnSettingsClicked;
         }
 
@@ -45,7 +45,7 @@ public sealed class WindowManager
 
     private void OnSettingsClicked()
     {
-        var win = new SettingsWindow(_settings,
+        var win = new SettingsWindow(Settings,
             onWidthChanged: w => _sidebar?.ApplyWidth(w),
             onThemeChanged: t => _sidebar?.ApplyTheme(t),
             onOpacityChanged: o => _sidebar!.ApplyOpacity(o));

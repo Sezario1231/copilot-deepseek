@@ -21,6 +21,7 @@ public sealed class AppSettings
     public string Theme { get; set; } = "System";
     public double AnimationSpeed { get; set; } = 1.0;
     public double SidebarOpacity { get; set; } = 1.0;
+    public bool MapCopilotToRightCtrl { get; set; }
 
     public ThemeMode GetThemeMode() => Theme switch
     {

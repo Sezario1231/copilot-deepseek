@@ -8,11 +8,12 @@
         Title="DeepSeek Copilot 设置"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Width="400" Height="450"
+        Width="400" Height="480"
         ShowInTaskbar="False"
         Topmost="True">
     <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -110,7 +111,11 @@
                     Width="100" Margin="8,0,0,0"/>
         </Grid>
 
-        <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+        <CheckBox x:Name="CopilotMapCheck" Grid.Row="8" Content="将 Copilot 键映射为右 Ctrl"
+                  FontSize="14" Foreground="#333" IsChecked="{Binding MapCopilotToRightCtrl}"
+                  Margin="0,12,0,0"/>
+
+        <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
             <Button Content="保存" Width="80" Height="32"
                     Background="#4F6BED" Foreground="White" BorderThickness="0"
                     Click="OnSaveClick" Cursor="Hand" Margin="0,0,8,0"/>

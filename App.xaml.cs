@@ -29,8 +29,8 @@ public partial class App : System.Windows.Application
             return;
         }
 
-        _keyboardService = new KeyboardHookService();
         _windowManager = new WindowManager();
+        _keyboardService = new KeyboardHookService(_windowManager.Settings);
         _keyboardService.CopilotKeyPressed += OnCopilotKeyPressed;
 
         SetupTrayIcon();
@@ -52,8 +52,23 @@ public partial class App : System.Windows.Application
         _trayIcon.Click += (_, _) => _windowManager?.Toggle();
 
         var menu = new Forms.ContextMenuStrip();
+
+        var mapItem = new Forms.ToolStripMenuItem("Copilot → 右 Ctrl")
+        {
+            Checked = _windowManager!.Settings.MapCopilotToRightCtrl
+        };
+        mapItem.Click += (_, _) =>
+        {
+            var s = _windowManager.Settings;
+            s.MapCopilotToRightCtrl = !s.MapCopilotToRightCtrl;
+            s.Save();
+            mapItem.Checked = s.MapCopilotToRightCtrl;
+        };
+
         menu.Items.Add("显示/隐藏", null, (_, _) => _windowManager?.Toggle());
         menu.Items.Add("设置", null, (_, _) => _windowManager?.OpenSettings());
+        menu.Items.Add(new Forms.ToolStripSeparator());
+        menu.Items.Add(mapItem);
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("退出", null, (_, _) => ExitApp());
         _trayIcon.ContextMenuStrip = menu;
