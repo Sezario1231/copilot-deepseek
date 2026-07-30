@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+	<radialGradient id="SVGzQHxbcHO" cx="-821.065" cy="-114.135" r="11.637" gradientTransform="rotate(230.696 -6403.153 -4285.167)scale(17.3033 16.2706)" gradientUnits="userSpaceOnUse">
+		<stop offset=".096" stop-color="#00aeff" />
+		<stop offset=".773" stop-color="#2253ce" />
+		<stop offset="1" stop-color="#0736c4" />
+	</radialGradient>
+	<path fill="url(#SVGzQHxbcHO)" d="M374 62c-6.7-22.9-27.8-38.7-51.7-38.7h-15.7c-26 0-48.3 18.6-53 44.2l-26.9 146.8l6.7-22.9c6.7-23 27.8-38.8 51.7-38.8h91.4l38.3 14.9l36.9-14.9H441c-23.9 0-45-15.8-51.7-38.7z" />
+	<radialGradient id="SVGeQ7oTdlE" cx="-682.504" cy="-157.15" r="11.637" gradientTransform="rotate(51.84 -8280.8 10297.983)scale(15.9912 15.5119)" gradientUnits="userSpaceOnUse">
+		<stop offset="0" stop-color="#ffb657" />
+		<stop offset=".634" stop-color="#ff5f3d" />
+		<stop offset=".923" stop-color="#c02b3c" />
+	</radialGradient>
+	<path fill="url(#SVGeQ7oTdlE)" d="M143.5 449.8c6.7 23 27.8 38.9 51.8 38.9h33.4c29.2 0 53.1-23.3 53.9-52.5l3.6-141.5l-7.6 26c-6.7 23-27.8 38.7-51.7 38.7h-92.2l-32.9-17.8l-35.6 17.8h10.6c24 0 45.1 15.9 51.8 38.9z" />
+	<linearGradient id="SVGEignmcNq" x1="151.469" x2="178.099" y1="339.458" y2="647.55" gradientTransform="translate(0 -278)" gradientUnits="userSpaceOnUse">
+		<stop offset=".156" stop-color="#0d91e1" />
+		<stop offset=".487" stop-color="#52b471" />
+		<stop offset=".652" stop-color="#98bd42" />
+		<stop offset=".937" stop-color="#ffc800" />
+	</linearGradient>
+	<path fill="url(#SVGEignmcNq)" d="M320 23.3H133.4C80 23.3 48 93.7 26.7 164.2C1.4 247.7-31.6 359.4 64 359.4h80.6c24.1 0 45.2-15.9 51.8-39.1c14-49 38.6-134.5 57.9-199.6c9.8-33.1 18-61.5 30.5-79.2c7.1-9.9 18.8-18.2 35.2-18.2" />
+	<linearGradient id="SVGuWEDzcFQ" x1="154.122" x2="168.661" y1="300.884" y2="636.947" gradientTransform="translate(0 -278)" gradientUnits="userSpaceOnUse">
+		<stop offset="0" stop-color="#3dcbff" />
+		<stop offset=".247" stop-color="#0588f7" stop-opacity="0" />
+	</linearGradient>
+	<path fill="url(#SVGuWEDzcFQ)" d="M320 23.3H133.4C80 23.3 48 93.7 26.7 164.2C1.4 247.7-31.6 359.4 64 359.4h80.6c24.1 0 45.2-15.9 51.8-39.1c14-49 38.6-134.5 57.9-199.6c9.8-33.1 18-61.5 30.5-79.2c7.1-9.9 18.8-18.2 35.2-18.2" />
+	<radialGradient id="SVGVsRHHb6P" cx="-749.029" cy="-171.779" r="11.637" gradientTransform="rotate(109.274 -16993.399 6475.348)scale(38.3873 45.9867)" gradientUnits="userSpaceOnUse">
+		<stop offset=".066" stop-color="#8c48ff" />
+		<stop offset=".5" stop-color="#f2598a" />
+		<stop offset=".896" stop-color="#ffb152" />
+	</radialGradient>
+	<path fill="url(#SVGVsRHHb6P)" d="M192 488.7h186.7c53.3 0 85.3-70.5 106.7-141c25.3-83.5 58.3-195.2-37.3-195.2h-80.6c-24.1 0-45.2 15.9-51.8 39.1c-14 49-38.6 134.6-57.9 199.7c-9.8 33.1-18 61.5-30.5 79.2c-7.2 9.9-18.9 18.2-35.3 18.2" />
+	<linearGradient id="SVGj4AnoeGb" x1="352.516" x2="352.325" y1="409.769" y2="501.338" gradientTransform="translate(0 -278)" gradientUnits="userSpaceOnUse">
+		<stop offset=".058" stop-color="#f8adfa" />
+		<stop offset=".708" stop-color="#a86edd" stop-opacity="0" />
+	</linearGradient>
+	<path fill="url(#SVGj4AnoeGb)" d="M192 488.7h186.7c53.3 0 85.3-70.5 106.7-141c25.3-83.5 58.3-195.2-37.3-195.2h-80.6c-24.1 0-45.2 15.9-51.8 39.1c-14 49-38.6 134.6-57.9 199.7c-9.8 33.1-18 61.5-30.5 79.2c-7.2 9.9-18.9 18.2-35.3 18.2" />
+</svg>

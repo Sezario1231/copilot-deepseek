@@ -1,0 +1,30 @@
+﻿<Window x:Class="deepseek_copilot.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:deepseek_copilot"
+        mc:Ignorable="d"
+        Title="按键检测工具 - 按下 Copilot 键观察输出" Height="420" Width="600"
+        Topmost="True"
+        WindowStartupLocation="CenterScreen"
+        Closed="Window_Closed">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="按下 Copilot 键，观察下方的原始数据" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
+        <Border Grid.Row="1" Background="#F0F4FF" CornerRadius="8" Padding="12" Margin="0,0,0,8">
+            <StackPanel>
+                <TextBlock x:Name="KeyDisplay" Text="等待按键..." FontSize="24" FontWeight="Bold" Foreground="#4F6BED"/>
+                <TextBlock x:Name="RawDisplay" Text="" FontSize="14" FontFamily="Consolas" Foreground="#666" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Border>
+        <TextBlock Grid.Row="2" Text="事件日志 (最新在最下面):" FontSize="12" Foreground="#888" Margin="0,0,0,4"/>
+        <TextBox Grid.Row="3" x:Name="LogBox" IsReadOnly="True"
+                 VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="13"/>
+    </Grid>
+</Window>
