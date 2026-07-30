@@ -13,6 +13,7 @@ public partial class SettingsWindow : Window
     private readonly ThemeMode _originalTheme;
     private readonly double _originalOpacity;
     private readonly bool _originalCopilotMap;
+    private readonly bool _originalToggleShortcut;
 
     public SettingsWindow(AppSettings settings, Action<double> onWidthChanged,
         Action<ThemeMode> onThemeChanged, Action<double> onOpacityChanged)
@@ -23,6 +24,7 @@ public partial class SettingsWindow : Window
         _originalTheme = settings.GetThemeMode();
         _originalOpacity = settings.SidebarOpacity;
         _originalCopilotMap = settings.MapCopilotToRightCtrl;
+        _originalToggleShortcut = settings.EnableToggleShortcut;
         _onWidthChanged = onWidthChanged;
         _onThemeChanged = onThemeChanged;
         _onOpacityChanged = onOpacityChanged;
@@ -61,6 +63,7 @@ public partial class SettingsWindow : Window
         _settings.SetThemeMode(_originalTheme);
         _settings.SidebarOpacity = _originalOpacity;
         _settings.MapCopilotToRightCtrl = _originalCopilotMap;
+        _settings.EnableToggleShortcut = _originalToggleShortcut;
         _onWidthChanged(_settings.SidebarWidth);
         _onThemeChanged(_originalTheme);
         _onOpacityChanged(_originalOpacity);

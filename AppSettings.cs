@@ -22,6 +22,7 @@ public sealed class AppSettings
     public double AnimationSpeed { get; set; } = 1.0;
     public double SidebarOpacity { get; set; } = 1.0;
     public bool MapCopilotToRightCtrl { get; set; }
+    public bool EnableToggleShortcut { get; set; }
 
     public ThemeMode GetThemeMode() => Theme switch
     {

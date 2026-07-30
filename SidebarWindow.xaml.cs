@@ -1,6 +1,7 @@
 using Microsoft.Web.WebView2.Wpf;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -169,12 +170,14 @@ public partial class SidebarWindow : Window
         if (_webView == null)
         {
             Show();
+            Activate();
             await CreateWebViewAsync();
             AnimateIn();
         }
         else
         {
             Show();
+            Activate();
             AnimateIn();
         }
     }
@@ -189,10 +192,19 @@ public partial class SidebarWindow : Window
             Duration = TimeSpan.FromMilliseconds(BaseAnimationDurationMs / _settings.AnimationSpeed),
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
         };
-        anim.Completed += (_, _) =>
+        anim.Completed += async (_, _) =>
         {
             IsAnimating = false;
-            _webView?.Focus();
+            if (_webView != null)
+            {
+                Keyboard.Focus(_webView);
+                try
+                {
+                    await _webView.CoreWebView2!.ExecuteScriptAsync(
+                        "try{let e=document.querySelector('textarea,input');e?.focus()}catch{}");
+                }
+                catch { }
+            }
         };
         BeginAnimation(LeftProperty, anim);
     }

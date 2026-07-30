@@ -23,6 +23,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="侧边栏宽度" FontSize="14"
@@ -115,7 +116,11 @@
                   FontSize="14" Foreground="#333" IsChecked="{Binding MapCopilotToRightCtrl}"
                   Margin="0,12,0,0"/>
 
-        <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+        <CheckBox x:Name="ToggleShortcutCheck" Grid.Row="9" Content="Copilot + 左 Ctrl 切换映射"
+                  FontSize="14" Foreground="#333" IsChecked="{Binding EnableToggleShortcut}"
+                  Margin="0,4,0,0"/>
+
+        <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
             <Button Content="保存" Width="80" Height="32"
                     Background="#4F6BED" Foreground="White" BorderThickness="0"
                     Click="OnSaveClick" Cursor="Hand" Margin="0,0,8,0"/>
