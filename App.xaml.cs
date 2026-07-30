@@ -10,6 +10,7 @@ public partial class App : System.Windows.Application
     private WindowManager? _windowManager;
     private KeyboardHookService? _keyboardService;
     private Forms.NotifyIcon? _trayIcon;
+    private Forms.ToolStripMenuItem? _mapMenuItem;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -34,6 +35,12 @@ public partial class App : System.Windows.Application
         _keyboardService.CopilotKeyPressed += OnCopilotKeyPressed;
 
         SetupTrayIcon();
+
+        _keyboardService.MappingToggled += () =>
+        {
+            if (_mapMenuItem != null)
+                _mapMenuItem.Checked = _windowManager!.Settings.MapCopilotToRightCtrl;
+        };
     }
 
     private void OnCopilotKeyPressed()
@@ -53,22 +60,22 @@ public partial class App : System.Windows.Application
 
         var menu = new Forms.ContextMenuStrip();
 
-        var mapItem = new Forms.ToolStripMenuItem("Copilot → 右 Ctrl")
+        _mapMenuItem = new Forms.ToolStripMenuItem("Copilot → 右 Ctrl")
         {
             Checked = _windowManager!.Settings.MapCopilotToRightCtrl
         };
-        mapItem.Click += (_, _) =>
+        _mapMenuItem.Click += (_, _) =>
         {
             var s = _windowManager.Settings;
             s.MapCopilotToRightCtrl = !s.MapCopilotToRightCtrl;
             s.Save();
-            mapItem.Checked = s.MapCopilotToRightCtrl;
+            _mapMenuItem.Checked = s.MapCopilotToRightCtrl;
         };
 
         menu.Items.Add("显示/隐藏", null, (_, _) => _windowManager?.Toggle());
         menu.Items.Add("设置", null, (_, _) => _windowManager?.OpenSettings());
         menu.Items.Add(new Forms.ToolStripSeparator());
-        menu.Items.Add(mapItem);
+        menu.Items.Add(_mapMenuItem);
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("退出", null, (_, _) => ExitApp());
         _trayIcon.ContextMenuStrip = menu;

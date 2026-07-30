@@ -112,11 +112,11 @@
                     Width="100" Margin="8,0,0,0"/>
         </Grid>
 
-        <CheckBox x:Name="CopilotMapCheck" Grid.Row="8" Content="将 Copilot 键映射为右 Ctrl"
+        <CheckBox x:Name="CopilotMapCheck" Grid.Row="8" Content="将 Copilot 键映射为右Ctrl"
                   FontSize="14" Foreground="#333" IsChecked="{Binding MapCopilotToRightCtrl}"
                   Margin="0,12,0,0"/>
 
-        <CheckBox x:Name="ToggleShortcutCheck" Grid.Row="9" Content="Copilot + 左 Ctrl 切换映射"
+        <CheckBox x:Name="ToggleShortcutCheck" Grid.Row="9" Content="按下 Copilot + 左Ctrl 切换映射"
                   FontSize="14" Foreground="#333" IsChecked="{Binding EnableToggleShortcut}"
                   Margin="0,4,0,0"/>
 
