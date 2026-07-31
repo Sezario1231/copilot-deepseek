@@ -15,6 +15,7 @@ public partial class SidebarWindow : Window
     private readonly AppSettings _settings;
     private double _sidebarWidth = 450;
     private DispatcherTimer? _unloadTimer;
+    private readonly DispatcherTimer _hideTimer;
     private WebView2? _webView;
     private bool _isOpeningSettings;
 
@@ -27,7 +28,34 @@ public partial class SidebarWindow : Window
     [DllImport("user32.dll")]
     private static extern IntPtr GetAncestor(IntPtr hWnd, uint gaFlags);
 
+    [DllImport("user32.dll")]
+    private static extern bool GetCursorPos(out POINT lpPoint);
+
+    [DllImport("user32.dll")]
+    private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+    [DllImport("user32.dll")]
+    private static extern short GetAsyncKeyState(int vKey);
+
     private const uint GA_ROOTOWNER = 3;
+    private const int VK_LBUTTON = 0x01;
+    private const int MouseKeyDown = 0x8000;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct POINT
+    {
+        public int X;
+        public int Y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct RECT
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
 
     public SidebarWindow(AppSettings settings)
     {
@@ -45,6 +73,9 @@ public partial class SidebarWindow : Window
         Deactivated += OnDeactivated;
         PreviewKeyDown += OnPreviewKeyDown;
         Loaded += OnLoaded;
+
+        _hideTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+        _hideTimer.Tick += OnHideTick;
     }
 
     public void ApplyTheme(ThemeMode theme)
@@ -163,6 +194,7 @@ public partial class SidebarWindow : Window
     public async void SlideIn()
     {
         if (IsAnimating) return;
+        _hideTimer.Stop();
         _unloadTimer?.Stop();
 
         IsAnimating = true;
@@ -250,7 +282,35 @@ public partial class SidebarWindow : Window
             if (root == ourHwnd) return;
         }
 
+        _hideTimer.Stop();
+        _hideTimer.Start();
+    }
+
+    private void OnHideTick(object? sender, EventArgs e)
+    {
+        _hideTimer.Stop();
+        if (IsActive) return;
+        if (Visibility != Visibility.Visible) return;
+
+        if (IsCursorOverWindow())
+            return;
+
+        if ((GetAsyncKeyState(VK_LBUTTON) & MouseKeyDown) != 0)
+        {
+            _hideTimer.Start();
+            return;
+        }
+
         SlideOut();
+    }
+
+    private bool IsCursorOverWindow()
+    {
+        var hwnd = new WindowInteropHelper(this).Handle;
+        if (!GetCursorPos(out var pt)) return false;
+        if (!GetWindowRect(hwnd, out var rect)) return false;
+        return pt.X >= rect.Left && pt.X <= rect.Right &&
+               pt.Y >= rect.Top && pt.Y <= rect.Bottom;
     }
 
     private void OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
