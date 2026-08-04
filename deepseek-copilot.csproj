@@ -22,7 +22,7 @@
     <!-- <PackageReference Include="KBEHtool" Version="0.4.0" /> -->
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.*" />
     <!-- <ProjectReference Include="..\..\..\Documents\GitHub\DanKeJson\DanKeJson\DanKeJson.csproj" /> -->
-    <PackageReference Include="DanKeJson" Version="1.4.4" />
+    <PackageReference Include="DanKeJson" Version="1.5.0" />
   </ItemGroup>
 
 </Project>
