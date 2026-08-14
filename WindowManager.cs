@@ -38,9 +38,17 @@ public sealed class WindowManager
         _sidebar.SlideIn();
     }
 
-    private void HideSidebar()
+    public void HideSidebar()
     {
         _sidebar?.SlideOut();
+    }
+
+    public async Task ShowSidebarAndPasteAsync()
+    {
+        ShowSidebar();
+        if (_sidebar == null) return;
+        await _sidebar.WaitForSlideInAsync();
+        await _sidebar.PasteClipboardImageAsync();
     }
 
     private void OnSettingsClicked()

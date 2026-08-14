@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace deepseek_copilot;
 
@@ -33,6 +34,7 @@ public partial class App : System.Windows.Application
         _windowManager = new WindowManager();
         _keyboardService = new KeyboardHookService(_windowManager.Settings);
         _keyboardService.CopilotKeyPressed += OnCopilotKeyPressed;
+        _keyboardService.CopilotLongPressed += OnCopilotLongPressed;
 
         SetupTrayIcon();
 
@@ -46,6 +48,41 @@ public partial class App : System.Windows.Application
     private void OnCopilotKeyPressed()
     {
         _windowManager?.Toggle();
+    }
+
+    private bool _captureActive;
+
+    private async void OnCopilotLongPressed()
+    {
+        if (_captureActive) return;
+        _captureActive = true;
+        try
+        {
+            await CaptureAndPasteAsync();
+        }
+        finally
+        {
+            _captureActive = false;
+        }
+    }
+
+    private async Task CaptureAndPasteAsync()
+    {
+        _windowManager?.HideSidebar();
+        await Task.Delay(300);
+
+        var capture = new ScreenCaptureWindow();
+        var tcs = new TaskCompletionSource<BitmapSource?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        capture.Confirmed += img => tcs.TrySetResult(img);
+        capture.Cancelled += () => tcs.TrySetResult(null);
+        capture.Show();
+        ScreenCaptureWindow.ForceForeground(new System.Windows.Interop.WindowInteropHelper(capture).Handle);
+
+        var image = await tcs.Task;
+        if (image == null || _windowManager == null) return;
+
+        System.Windows.Clipboard.SetImage(image);
+        await _windowManager.ShowSidebarAndPasteAsync();
     }
 
     private void SetupTrayIcon()

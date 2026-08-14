@@ -1,3 +1,4 @@
+using KBEHtool;
 using Microsoft.Web.WebView2.Wpf;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -18,6 +19,7 @@ public partial class SidebarWindow : Window
     private readonly DispatcherTimer _hideTimer;
     private WebView2? _webView;
     private bool _isOpeningSettings;
+    private TaskCompletionSource<bool>? _slideInTcs;
 
     public bool IsAnimating { get; private set; }
     public event Action? SettingsClicked;
@@ -197,6 +199,8 @@ public partial class SidebarWindow : Window
         _hideTimer.Stop();
         _unloadTimer?.Stop();
 
+        _slideInTcs?.TrySetCanceled();
+        _slideInTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         IsAnimating = true;
 
         if (_webView == null)
@@ -214,6 +218,58 @@ public partial class SidebarWindow : Window
         }
     }
 
+    public Task WaitForSlideInAsync()
+    {
+        if (_slideInTcs != null) return _slideInTcs.Task;
+
+        _slideInTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        if (!IsAnimating && Visibility == Visibility.Visible)
+            _slideInTcs.TrySetResult(true);
+        return _slideInTcs.Task;
+    }
+
+    public async Task PasteClipboardImageAsync()
+    {
+        if (_webView?.CoreWebView2 == null) return;
+
+        const string script =
+            "(()=>{const i=document.querySelector('textarea,input');if(i){i.focus();}" +
+            "const v=document.querySelector('[data-model-type=\"vision\"][role=\"radio\"]');" +
+            "if(v&&v.getAttribute('aria-checked')!=='true'){v.click();}" +
+            "return i?true:false;})()";
+
+        for (var i = 0; i < 40; i++)
+        {
+            try
+            {
+                var result = await _webView.CoreWebView2.ExecuteScriptAsync(script);
+                if (result == "true")
+                {
+                    await Task.Delay(250);
+                    break;
+                }
+            }
+            catch { }
+            await Task.Delay(150);
+        }
+
+        try
+        {
+            await _webView.CoreWebView2.ExecuteScriptAsync(
+                "(()=>{const v=document.querySelector('[data-model-type=\"vision\"][role=\"radio\"]');" +
+                "if(v&&v.getAttribute('aria-checked')!=='true'){v.click();}return true;})()");
+        }
+        catch { }
+
+        await Task.Delay(200);
+
+        try
+        {
+            KeyAction.PressKey(new[] { KeyCode.LeftControl, KeyCode.V }, 60);
+        }
+        catch { }
+    }
+
     private void AnimateIn()
     {
         var workArea = SystemParameters.WorkArea;
@@ -227,6 +283,7 @@ public partial class SidebarWindow : Window
         anim.Completed += async (_, _) =>
         {
             IsAnimating = false;
+            _slideInTcs?.TrySetResult(true);
             if (_webView != null)
             {
                 Keyboard.Focus(_webView);

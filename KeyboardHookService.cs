@@ -1,12 +1,20 @@
+using System.Windows.Threading;
 using KBEHtool;
 
 namespace deepseek_copilot;
 
 public sealed class KeyboardHookService : IDisposable
 {
+    private const int LongPressMs = 500;
+
     private readonly AppSettings _settings;
+    private readonly DispatcherTimer _holdTimer;
     private bool _copilotMapped;
+    private bool _copilotDown;
+    private bool _copilotLongPressed;
+
     public event Action? CopilotKeyPressed;
+    public event Action? CopilotLongPressed;
     public event Action? MappingToggled;
 
     public KeyboardHookService(AppSettings settings)
@@ -15,6 +23,9 @@ public sealed class KeyboardHookService : IDisposable
         KBEH.Start();
         KeyAction.AddKeyDownPreview(OnKeyDown);
         KeyAction.AddKeyUpPreview(OnKeyUp);
+
+        _holdTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(LongPressMs) };
+        _holdTimer.Tick += OnHoldTick;
     }
 
     private bool OnKeyDown(KeyCode kc)
@@ -36,27 +47,48 @@ public sealed class KeyboardHookService : IDisposable
         {
             KeyAction.PressKey(KeyCode.RightControl, -1);
             _copilotMapped = true;
+            return true;
         }
-        else
+
+        if (!_copilotDown)
         {
-            CopilotKeyPressed?.Invoke();
+            _copilotDown = true;
+            _copilotLongPressed = false;
+            _holdTimer.Start();
         }
         return true;
+    }
+
+    private void OnHoldTick(object? sender, EventArgs e)
+    {
+        _holdTimer.Stop();
+        if (!_copilotDown) return;
+
+        _copilotLongPressed = true;
+        CopilotLongPressed?.Invoke();
     }
 
     private bool OnKeyUp(KeyCode kc)
     {
         if (kc != KeyCode.Copilot) return false;
 
+        _holdTimer.Stop();
+        _copilotDown = false;
+
         if (_copilotMapped)
         {
             KeyAction.ReleaseKey(KeyCode.RightControl);
+        }
+        else if (!_copilotLongPressed)
+        {
+            CopilotKeyPressed?.Invoke();
         }
         return true;
     }
 
     public void Dispose()
     {
+        _holdTimer.Stop();
         KBEH.Stop();
     }
 }
