@@ -166,6 +166,73 @@ public partial class SidebarWindow : Window
 
     private string CurrentUrl => _settings.IsAgentMode ? _settings.HarnessUrl : _settings.ChatUrl;
 
+    private void NavigateToCurrent()
+    {
+        if (_webView?.CoreWebView2 == null) return;
+        if (_settings.IsAgentMode && !IsHarnessListening())
+        {
+            _webView.CoreWebView2.NavigateToString(BuildHarnessNoticeHtml());
+            return;
+        }
+        _webView.CoreWebView2.Navigate(CurrentUrl);
+    }
+
+    private static bool IsHarnessListening()
+    {
+        try
+        {
+            using var client = new System.Net.Sockets.TcpClient();
+            var task = client.ConnectAsync(System.Net.IPAddress.Loopback, 3081);
+            return task.Wait(300) && client.Connected;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private string BuildHarnessNoticeHtml()
+    {
+        var isDark = _settings.IsDarkTheme;
+        var bg = isDark ? "#151517" : "#FFFFFF";
+        var fg = isDark ? "#E8E8EA" : "#1A1A2E";
+        var sub = isDark ? "#9A9AA5" : "#666680";
+        var accent = isDark ? "#7FD1FF" : "#4D7CFE";
+        var html = """
+        <!DOCTYPE html>
+        <html lang="zh-CN">
+        <head>
+        <meta charset="utf-8">
+        <style>
+          body { margin:0; background:__BG__; color:__FG__; font-family:"Segoe UI","Microsoft YaHei",sans-serif; }
+          .wrap { max-width:420px; margin:80px auto 0; padding:0 28px; }
+          h1 { font-size:18px; margin:0 0 12px; }
+          p { font-size:13px; line-height:1.7; color:__SUB__; }
+          code { background:__BG__; border:1px solid __SUB__55; border-radius:4px; padding:1px 6px; font-size:12px; }
+          .tip { font-size:12px; color:__SUB__; margin-top:18px; border-top:1px solid __SUB__44; padding-top:14px; }
+          a { color:__ACCENT__; }
+        </style>
+        </head>
+        <body>
+          <div class="wrap">
+            <h1>Agent 模式需要本地 DeepSeek Harness</h1>
+            <p>目前 __URL__（端口 3081）没有在运行。</p>
+            <p>两种方式继续：</p>
+            <p>1. 按仓库 README 执行 <code>setup-harness.cmd</code> 后运行 <code>start-web.cmd</code>，本地部署 Harness 后自动可用；</p>
+            <p>2. 切回顶栏 <b>Chat</b> 模式，直接用 DeepSeek 网页版，无需任何配置。</p>
+            <div class="tip">说明：这是为保护隐私与隔离设计的本地 Agent 环境；直接下载的 exe 默认未附带该组件。</div>
+          </div>
+        </body>
+        </html>
+        """;
+        return html
+            .Replace("__BG__", bg)
+            .Replace("__FG__", fg)
+            .Replace("__SUB__", sub)
+            .Replace("__ACCENT__", accent)
+            .Replace("__URL__", _settings.HarnessUrl);
+    }
+
     private void OnChatTabClick(object sender, MouseButtonEventArgs e) => SetAgentMode(false);
 
     private void OnAgentTabClick(object sender, MouseButtonEventArgs e) => SetAgentMode(true);
@@ -176,7 +243,7 @@ public partial class SidebarWindow : Window
         _settings.IsAgentMode = agent;
         _settings.Save();
         UpdateModeUi();
-        _webView?.CoreWebView2?.Navigate(CurrentUrl);
+        NavigateToCurrent();
     }
 
     private void UpdateModeUi()
@@ -232,7 +299,7 @@ public partial class SidebarWindow : Window
         await _webView.EnsureCoreWebView2Async(env);
         _webView.CoreWebView2!.DocumentTitleChanged += OnTitleChanged;
         SetWebViewColorScheme(_settings.IsDarkTheme);
-        _webView.CoreWebView2.Navigate(CurrentUrl);
+        NavigateToCurrent();
         TitleText.Text = _webView.CoreWebView2.DocumentTitle;
     }
 
