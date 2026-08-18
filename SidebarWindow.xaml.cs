@@ -14,12 +14,14 @@ public partial class SidebarWindow : Window
 {
     private const double BaseAnimationDurationMs = 250;
     private readonly AppSettings _settings;
-    private double _sidebarWidth = 450;
+    private double _sidebarWidth = 960;
     private DispatcherTimer? _unloadTimer;
     private readonly DispatcherTimer _hideTimer;
     private WebView2? _webView;
     private bool _isOpeningSettings;
     private TaskCompletionSource<bool>? _slideInTcs;
+    private System.Windows.Media.Brush? _iconHover;
+    private System.Windows.Media.Brush _tabHover = System.Windows.Media.Brushes.Transparent;
 
     public bool IsAnimating { get; private set; }
     public event Action? SettingsClicked;
@@ -63,6 +65,7 @@ public partial class SidebarWindow : Window
     {
         _settings = settings;
         InitializeComponent();
+        UpdateModeUi();
 
         Icon = IconHelper.RenderToBitmapSource(16);
         TitleIcon.Source = IconHelper.RenderToBitmapSource(18);
@@ -76,8 +79,23 @@ public partial class SidebarWindow : Window
         PreviewKeyDown += OnPreviewKeyDown;
         Loaded += OnLoaded;
 
+        SettingsButton.MouseEnter += (_, _) => SettingsButton.Background = _iconHover ?? System.Windows.Media.Brushes.Transparent;
+        SettingsButton.MouseLeave += (_, _) => SettingsButton.Background = System.Windows.Media.Brushes.Transparent;
+        CloseButton.MouseEnter += (_, _) => CloseButton.Background = _iconHover ?? System.Windows.Media.Brushes.Transparent;
+        CloseButton.MouseLeave += (_, _) => CloseButton.Background = System.Windows.Media.Brushes.Transparent;
+        ChatTab.MouseEnter += (_, _) => TabHover(ChatTab, false);
+        ChatTab.MouseLeave += (_, _) => UpdateModeUi();
+        AgentTab.MouseEnter += (_, _) => TabHover(AgentTab, true);
+        AgentTab.MouseLeave += (_, _) => UpdateModeUi();
+
         _hideTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
         _hideTimer.Tick += OnHideTick;
+    }
+
+    private void TabHover(System.Windows.Controls.Border tab, bool isAgent)
+    {
+        if (isAgent == _settings.IsAgentMode) return;
+        tab.Background = _tabHover;
     }
 
     public void ApplyTheme(ThemeMode theme)
@@ -90,10 +108,24 @@ public partial class SidebarWindow : Window
         TitleText.Foreground = new SolidColorBrush(textColor);
 
         var btnColor = isDark ? Colors.White : System.Windows.Media.Color.FromRgb(0x66, 0x66, 0x66);
-        SettingsButton.Foreground = new SolidColorBrush(btnColor);
-        CloseButton.Foreground = new SolidColorBrush(btnColor);
+        SettingsButtonText.Foreground = new SolidColorBrush(btnColor);
+        CloseButtonText.Foreground = new SolidColorBrush(btnColor);
+        _iconHover = new SolidColorBrush(isDark
+            ? System.Windows.Media.Color.FromArgb(0x26, 0xFF, 0xFF, 0xFF)
+            : System.Windows.Media.Color.FromArgb(0x12, 0x00, 0x00, 0x00));
+        _tabHover = new SolidColorBrush(isDark
+            ? System.Windows.Media.Color.FromArgb(0x14, 0xFF, 0xFF, 0xFF)
+            : System.Windows.Media.Color.FromArgb(0x0A, 0x00, 0x00, 0x00));
+
+        TitleBar.BorderBrush = new SolidColorBrush(isDark
+            ? System.Windows.Media.Color.FromArgb(0x1F, 0xFF, 0xFF, 0xFF)
+            : System.Windows.Media.Color.FromArgb(0x12, 0x00, 0x00, 0x00));
+        ModeSwitch.Background = new SolidColorBrush(isDark
+            ? System.Windows.Media.Color.FromArgb(0x1A, 0xFF, 0xFF, 0xFF)
+            : System.Windows.Media.Color.FromArgb(0x0C, 0x00, 0x00, 0x00));
 
         SetWebViewColorScheme(isDark);
+        UpdateModeUi();
     }
 
     public void ApplyOpacity(double opacity)
@@ -132,6 +164,58 @@ public partial class SidebarWindow : Window
         await CreateWebViewAsync();
     }
 
+    private string CurrentUrl => _settings.IsAgentMode ? _settings.HarnessUrl : _settings.ChatUrl;
+
+    private void OnChatTabClick(object sender, MouseButtonEventArgs e) => SetAgentMode(false);
+
+    private void OnAgentTabClick(object sender, MouseButtonEventArgs e) => SetAgentMode(true);
+
+    private void SetAgentMode(bool agent)
+    {
+        if (_settings.IsAgentMode == agent) return;
+        _settings.IsAgentMode = agent;
+        _settings.Save();
+        UpdateModeUi();
+        _webView?.CoreWebView2?.Navigate(CurrentUrl);
+    }
+
+    private void UpdateModeUi()
+    {
+        if (ChatTabText == null || AgentTabText == null) return;
+        var isDark = _settings.IsDarkTheme;
+        var activeBg = isDark
+            ? System.Windows.Media.Color.FromArgb(0x2B, 0xFF, 0xFF, 0xFF)
+            : System.Windows.Media.Color.FromRgb(0xFF, 0xFF, 0xFF);
+        var activeBorder = isDark
+            ? System.Windows.Media.Color.FromArgb(0x33, 0xFF, 0xFF, 0xFF)
+            : System.Windows.Media.Color.FromArgb(0x1F, 0x00, 0x00, 0x00);
+        var activeFg = isDark ? Colors.White : System.Windows.Media.Color.FromRgb(0x1A, 0x1A, 0x2E);
+        var inactiveFg = isDark
+            ? System.Windows.Media.Color.FromArgb(0x8A, 0xFF, 0xFF, 0xFF)
+            : System.Windows.Media.Color.FromArgb(0x99, 0x00, 0x00, 0x00);
+
+        if (_settings.IsAgentMode)
+        {
+            AgentTab.Background = new SolidColorBrush(activeBg);
+            AgentTab.BorderBrush = new SolidColorBrush(activeBorder);
+            AgentTab.BorderThickness = new Thickness(1);
+            AgentTabText.Foreground = new SolidColorBrush(activeFg);
+            ChatTab.Background = System.Windows.Media.Brushes.Transparent;
+            ChatTab.BorderThickness = new Thickness(0);
+            ChatTabText.Foreground = new SolidColorBrush(inactiveFg);
+        }
+        else
+        {
+            ChatTab.Background = new SolidColorBrush(activeBg);
+            ChatTab.BorderBrush = new SolidColorBrush(activeBorder);
+            ChatTab.BorderThickness = new Thickness(1);
+            ChatTabText.Foreground = new SolidColorBrush(activeFg);
+            AgentTab.Background = System.Windows.Media.Brushes.Transparent;
+            AgentTab.BorderThickness = new Thickness(0);
+            AgentTabText.Foreground = new SolidColorBrush(inactiveFg);
+        }
+    }
+
     private async Task CreateWebViewAsync()
     {
         if (_webView != null) return;
@@ -148,7 +232,7 @@ public partial class SidebarWindow : Window
         await _webView.EnsureCoreWebView2Async(env);
         _webView.CoreWebView2!.DocumentTitleChanged += OnTitleChanged;
         SetWebViewColorScheme(_settings.IsDarkTheme);
-        _webView.CoreWebView2.Navigate(_settings.ChatUrl);
+        _webView.CoreWebView2.Navigate(CurrentUrl);
         TitleText.Text = _webView.CoreWebView2.DocumentTitle;
     }
 
@@ -319,7 +403,7 @@ public partial class SidebarWindow : Window
         BeginAnimation(LeftProperty, anim);
     }
 
-    private void OnSettingsClick(object sender, RoutedEventArgs e)
+    private void OnSettingsClick(object sender, MouseButtonEventArgs e)
     {
         _isOpeningSettings = true;
         SettingsClicked?.Invoke();
@@ -378,7 +462,7 @@ public partial class SidebarWindow : Window
         }
     }
 
-    private void OnCloseClick(object sender, RoutedEventArgs e)
+    private void OnCloseClick(object sender, MouseButtonEventArgs e)
     {
         SlideOut();
     }

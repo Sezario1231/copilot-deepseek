@@ -11,7 +11,7 @@
         Topmost="True"
         ShowInTaskbar="False"
         ResizeMode="NoResize"
-        Width="450">
+        Width="960">
     <Grid>
         <Border x:Name="MainBorder" CornerRadius="8,0,0,8" Background="#FFFFFF">
             <Border.Effect>
@@ -19,29 +19,58 @@
             </Border.Effect>
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="46"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <!-- Title Bar -->
-                <Border x:Name="TitleBar" Grid.Row="0" Background="#FFFFFF" CornerRadius="8,0,0,0">
+                <Border x:Name="TitleBar" Grid.Row="0" Background="#FFFFFF" CornerRadius="8,0,0,0"
+                        BorderThickness="0,0,0,1" BorderBrush="#12000000">
                     <Grid>
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"
+                                    Margin="14,0,0,0">
                             <Image x:Name="TitleIcon" Width="18" Height="18"/>
-                            <TextBlock x:Name="TitleText" Text="加载中…" FontSize="14" FontWeight="SemiBold"
-                                       Margin="8,0,0,0"
-                                       Foreground="#1A1A2E"
+                            <TextBlock x:Name="TitleText" Text="加载中…" FontSize="13" FontWeight="SemiBold"
+                                       Margin="8,0,0,0" Foreground="#1A1A2E"
                                        TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,8,0">
-                            <Button x:Name="SettingsButton" Content="⚙" Width="32" Height="32"
-                                    Background="Transparent" BorderThickness="0"
-                                    Foreground="#666" FontSize="16"
-                                    Click="OnSettingsClick" Cursor="Hand"/>
-                            <Button x:Name="CloseButton" Content="✕" Width="32" Height="32"
-                                    Background="Transparent" BorderThickness="0"
-                                    Foreground="#666" FontSize="16"
-                                    Click="OnCloseClick" Cursor="Hand"/>
+
+                        <Border Grid.Column="1" x:Name="ModeSwitch" CornerRadius="9" Padding="2"
+                                Background="#0F000000" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <Border x:Name="ChatTab" CornerRadius="7" Padding="16,4" Cursor="Hand"
+                                        Background="Transparent" BorderBrush="Transparent" BorderThickness="0"
+                                        MouseLeftButtonUp="OnChatTabClick">
+                                    <TextBlock x:Name="ChatTabText" Text="Chat" FontSize="12" FontWeight="SemiBold"/>
+                                </Border>
+                                <Border x:Name="AgentTab" CornerRadius="7" Padding="16,4" Cursor="Hand"
+                                        Background="Transparent" BorderBrush="Transparent" BorderThickness="0"
+                                        MouseLeftButtonUp="OnAgentTabClick">
+                                    <TextBlock x:Name="AgentTabText" Text="Agent" FontSize="12" FontWeight="SemiBold"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                                    VerticalAlignment="Center" Margin="0,0,10,0">
+                            <Border x:Name="SettingsButton" Width="30" Height="30" CornerRadius="7"
+                                    Background="Transparent" Cursor="Hand" MouseLeftButtonUp="OnSettingsClick"
+                                    ToolTip="设置" VerticalAlignment="Center">
+                                <TextBlock x:Name="SettingsButtonText" Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border x:Name="CloseButton" Width="30" Height="30" CornerRadius="7"
+                                    Background="Transparent" Cursor="Hand" MouseLeftButtonUp="OnCloseClick"
+                                    ToolTip="关闭" VerticalAlignment="Center" Margin="4,0,0,0">
+                                <TextBlock x:Name="CloseButtonText" Text="&#xE8BB;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
                         </StackPanel>
                     </Grid>
                 </Border>

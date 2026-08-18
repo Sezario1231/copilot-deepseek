@@ -14,10 +14,12 @@ public sealed class AppSettings
 {
     private const string AutoStartKey = "DeepSeekCopilot";
 
-    public double SidebarWidth { get; set; } = 450;
+    public double SidebarWidth { get; set; } = 960;
     public bool AutoStart { get; set; }
     public int UnloadDelaySeconds { get; set; } = 5;
     public string ChatUrl { get; set; } = "https://chat.deepseek.com/";
+    public string HarnessUrl { get; set; } = "http://127.0.0.1:3081/";
+    public bool IsAgentMode { get; set; } = true;
     public string Theme { get; set; } = "System";
     public double AnimationSpeed { get; set; } = 1.0;
     public double SidebarOpacity { get; set; } = 1.0;
@@ -85,8 +87,12 @@ public sealed class AppSettings
                 var s = DanKeJson.JSON.ToData<AppSettings>(File.ReadAllText(FilePath));
                 if (s != null)
                 {
-                    s.ChatUrl = string.IsNullOrEmpty(s.ChatUrl) ? "https://chat.deepseek.com/" : s.ChatUrl;
-                    if (s.SidebarWidth <= 0) s.SidebarWidth = 450;
+                    if (string.IsNullOrEmpty(s.ChatUrl)
+                        || s.ChatUrl.Equals(s.HarnessUrl, StringComparison.OrdinalIgnoreCase)
+                        || s.ChatUrl.IndexOf("127.0.0.1:3081", StringComparison.OrdinalIgnoreCase) >= 0)
+                        s.ChatUrl = "https://chat.deepseek.com/";
+                    if (string.IsNullOrEmpty(s.HarnessUrl)) s.HarnessUrl = "http://127.0.0.1:3081/";
+                    if (s.SidebarWidth <= 0) s.SidebarWidth = 960;
                     if (s.UnloadDelaySeconds <= 0) s.UnloadDelaySeconds = 5;
                     return s;
                 }

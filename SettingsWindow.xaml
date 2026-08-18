@@ -34,8 +34,8 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Slider x:Name="WidthSlider" Grid.Column="0" Minimum="250" Maximum="800"
-                    Value="450" TickFrequency="10" IsSnapToTickEnabled="True"
+            <Slider x:Name="WidthSlider" Grid.Column="0" Minimum="640" Maximum="1600"
+                    Value="960" TickFrequency="10" IsSnapToTickEnabled="True"
                     ValueChanged="OnWidthChanged"/>
             <TextBlock Grid.Column="1" Text="{Binding ElementName=WidthSlider, Path=Value, StringFormat={}{0:0}}"
                        VerticalAlignment="Center" Foreground="#333" FontSize="14"
